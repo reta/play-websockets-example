@@ -1,0 +1,36 @@
+@(host: Host)( implicit request: RequestHeader )
+
+<div id="content">
+	<div id="chart"></div>
+	
+    <script type="text/javascript">
+        var charts = []  	
+	    charts[ '@host.id' ] = new Highcharts.Chart({    	            
+	        chart: {
+	            renderTo: 'chart',
+	            defaultSeriesType: 'spline'            
+	        },           
+	        xAxis: {
+                type: 'datetime'
+            },   
+	        series: [{
+	            name: "CPU",
+	            data: []
+	           }
+	        ]
+	    }); 
+    </script>	    
+</div>
+
+<script type="text/javascript">
+var socket = new WebSocket("@routes.Application.stats( host.id ).webSocketURL()")
+socket.onmessage = function( event ) {	
+	var datapoint = jQuery.parseJSON( event.data );
+	var chart = charts[ '@host.id' ]
+	 
+	chart.series[ 0 ].addPoint({
+        x: datapoint.cpu.timestamp,
+        y: datapoint.cpu.load
+    }, true, chart.series[ 0 ].data.length >= 50 );
+}
+</script>
