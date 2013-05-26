@@ -1,0 +1,1 @@
+Sample Play 2.1 application to demonstrate web sockets usage

@@ -13,18 +13,10 @@ import play.api.libs.json.JsValue
 
 class StatisticsActor( hostid: String ) extends Actor {
   val ( enumerator, channel ) = Concurrent.broadcast[JsValue]
-  var connected: Boolean = false
   
   def receive = {
-    case Connect( host ) => {
-      connected = true
-      sender ! Connected( enumerator )
-    }
-       
-    case Refresh => if( connected ) {
-	  val timestamp = new Date().getTime()	    
-  	  broadcast( timestamp, hostid )   
-    }
+    case Connect( host ) => sender ! Connected( enumerator )
+    case Refresh => broadcast( new Date().getTime(), hostid )     
   }
   
   def broadcast( timestamp: Long, id: String ) {
@@ -42,5 +34,4 @@ class StatisticsActor( hostid: String ) extends Actor {
 	    
 	channel.push( msg )
   }
-  
 }
