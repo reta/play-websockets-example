@@ -22,7 +22,7 @@ object Statistics {
 	implicit val timeout = Timeout( 5 second )
 	var actors: Map[ String, ActorRef ] = Map()
   
-    def actor( id: String ) = {
+    def actor( id: String ) = actors.synchronized {
 	   actors.find( _._1 == id ).map( _._2 ) match {
 	     case Some( actor ) => actor
 	     
