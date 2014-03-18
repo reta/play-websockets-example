@@ -10,6 +10,7 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.concurrent.Promise
 import scala.concurrent.duration.DurationInt
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 
 object Application extends Controller {  
   def index = Action {
@@ -28,7 +29,7 @@ object Application extends Controller {
       case Some( host ) => Statistics.attach( host )
       case None => {
 		val enumerator = Enumerator.generateM[JsValue]( Promise.timeout( None, 1.second ) ).andThen( Enumerator.eof )
-		Promise.pure( ( Iteratee.ignore[JsValue], enumerator ) )
+		Future.successful( ( Iteratee.ignore[JsValue], enumerator ) )
       }
     }
   }
