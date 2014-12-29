@@ -24,13 +24,10 @@ object Application extends Controller {
     }    
   }
   
-  def stats( id: String ) = WebSocket.async[JsValue] { request =>
+  def stats( id: String ) = WebSocket.tryAccept[JsValue] { request =>
     Hosts.hosts.find( _.id == id ) match {
-      case Some( host ) => Statistics.attach( host )
-      case None => {
-		val enumerator = Enumerator.generateM[JsValue]( Promise.timeout( None, 1.second ) ).andThen( Enumerator.eof )
-		Future.successful( ( Iteratee.ignore[JsValue], enumerator ) )
-      }
+      case Some( host ) => Statistics.attach( host ) map( Right( _ ) )
+      case None => Future.successful( Left( NoContent ) )
     }
   }
 }
